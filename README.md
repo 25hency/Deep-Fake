@@ -52,10 +52,6 @@ The Meso4 architecture consists of:
 - Dropout layers to prevent overfitting
 - Dense layers for classification
 
-## License
-
-[Specify license information here]
-
 ## Acknowledgements
 
 - Based on MesoNet architecture for deepfake detection

@@ -3,6 +3,8 @@ warnings.filterwarnings('ignore')
 from keras.models import Model as KerasModel
 from keras.layers import Input, Dense,Flatten, Conv2D, MaxPooling2D, BatchNormalization, Dropout, Reshape, Concatenate, LeakyReLU
 from keras.optimizers import Adam
+import os
+import urllib.request
 
 IMGWIDTH = 256
 class Classifier:
@@ -55,17 +57,28 @@ class Meso4(Classifier):
 
         return KerasModel(inputs=x, outputs=y)
       
-!wget https://github.com/PacktPublishing/Machine-Learning-for-Cybersecurity-Cookbook/raw/master/Chapter04/Deepfake%20Recognition/mesonet_weights/Meso4_DF  
+# Download files using urllib instead of !wget
+urls = [
+    ("https://github.com/PacktPublishing/Machine-Learning-for-Cybersecurity-Cookbook/raw/master/Chapter04/Deepfake%20Recognition/mesonet_weights/Meso4_DF", "Meso4_DF"),
+    ("https://github.com/PacktPublishing/Machine-Learning-for-Cybersecurity-Cookbook/raw/master/Chapter04/Deepfake%20Recognition/mesonet_test_images/df00204.jpg", "df1.jpg"),
+    ("https://github.com/PacktPublishing/Machine-Learning-for-Cybersecurity-Cookbook/raw/master/Chapter04/Deepfake%20Recognition/mesonet_test_images/real00240.jpg", "real.jpg")
+]
 
-!wget -O df1.jpg https://github.com/PacktPublishing/Machine-Learning-for-Cybersecurity-Cookbook/raw/master/Chapter04/Deepfake%20Recognition/mesonet_test_images/df00204.jpg
+for url, filename in urls:
+    print(f"Downloading {filename}...")
+    urllib.request.urlretrieve(url, filename)
 
-!wget -O real.jpg https://github.com/PacktPublishing/Machine-Learning-for-Cybersecurity-Cookbook/raw/master/Chapter04/Deepfake%20Recognition/mesonet_test_images/real00240.jpg
+# Create test_images directory if it doesn't exist
+if not os.path.exists("test_images"):
+    os.mkdir("test_images")
+
+# Move downloaded images to test_images directory
+for filename in ["df1.jpg", "real.jpg"]:
+    os.rename(filename, os.path.join("test_images", filename))
 
 from keras.preprocessing.image import ImageDataGenerator
 MesoNet_classifier= Meso4()
 MesoNet_classifier.load("Meso4_DF")
-!mkdir test_images
-!mv *.jpg test_images/
 imagedata_gen = ImageDataGenerator(rescale=1.0/255)
 datagen = imagedata_gen.flow_from_directory("./", classes=["test_images"])
 num_to_label = {1:"real", 0:"fake"}
